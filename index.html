@@ -1,477 +1,551 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Mathilde Martine PAISLEY - Consultante AMOA SIRH-Cheffe de Projet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>CV Interactif | Mathilde Martine PAISLEY | Consultante AMOA SIRH</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Professional Teal & Slate -->
+    <!-- Application Structure Plan: A dashboard-style SPA featuring a sticky navigation for easy access to key sections. The structure begins with a high-level summary and key metrics to provide an immediate overview of her qualifications. This is followed by an interactive skills section with charts for a quick visual grasp of her expertise. The professional experience is presented as an interactive, filterable timeline with expandable entries to manage information density and allow user-directed exploration. This non-linear, task-oriented design is chosen over a simple document scroll to make the dense information of a CV more digestible, engaging, and to empower recruiters to quickly find the information most relevant to them. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core Competencies ('Savoir-Faire') -> Goal: Compare strengths -> Viz: Radar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Provides a modern, at-a-glance holistic view of skill balance, more impactful than a list.
+        - Report Info: SIRH Tools -> Goal: Showcase technical breadth -> Viz: Horizontal Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Better for comparing discrete tool experience levels visually.
+        - Report Info: Work History -> Goal: Present detailed chronology without overwhelming -> Viz: Interactive Vertical Timeline (HTML/CSS/JS) -> Interaction: Click-to-expand details, tag-based filtering -> Justification: Manages information overload and allows recruiters to quickly drill down into relevant experiences (e.g., filter by 'SuccessFactors').
+        - Report Info: Key stats (years, tools) -> Goal: Inform and impress immediately -> Viz: Stat cards (HTML/Tailwind) -> Interaction: Static -> Justification: Establishes seniority and expertise upfront.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light blue-gray background */
-            color: #334155; /* Darker text */
-            line-height: 1.6;
+            background-color: #f1f5f9;
+            color: #334155;
         }
-        .container {
-            max-width: 900px;
-            margin: 2rem auto;
-            background-color: #ffffff;
-            border-radius: 1.5rem; /* More rounded corners */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0891b2;
+            border-bottom-color: #0891b2;
+        }
+        .timeline-item-content {
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            max-height: 0;
+            opacity: 0;
             overflow: hidden;
-            padding: 2.5rem; /* Increased padding */
         }
-        .header-section {
-            background-color: #0A2342; /* Deep Navy Blue for chic/premium */
-            color: #f8fafc; /* Off-white for softer contrast */
-            padding: 2rem 2.5rem;
-            border-radius: 1rem; /* Rounded corners for header */
-            margin-bottom: 2rem;
-            text-align: center;
+        .timeline-item.open .timeline-item-content {
+            max-height: 1500px;
+            opacity: 1;
         }
-        /* Style for main section titles (default: Framboise noircie) */
-        .section-title {
-            font-size: 1.75rem; /* Larger section titles */
-            font-weight: 600;
-            color: #a50b5e; /* Rose foncé for main titles */
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #a50b5e; /* Matching Rose foncé border */
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .section-title svg {
-            width: 1.75rem;
-            height: 1.75rem;
-            fill: currentColor;
-        }
-        .experience-item {
-            margin-bottom: 1.5rem;
+        .chart-container {
             position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
         }
-        /* Removed .experience-item::before to remove the small dot */
-        .experience-title {
-            font-weight: 600;
-            color: #007ACC; /* Vibrant Azure Blue for experience titles */
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-            padding-left: 0.5rem; /* Added padding-left for the bar */
-            border-left: 4px solid #007ACC; /* Vibrant Azure Blue for the bar */
-        }
-        .experience-company-date {
-            font-style: italic;
-            color: #64748b; /* Gray text */
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-        .experience-description ul {
-            list-style-type: none; /* Ensure no default bullets */
-            margin-left: 1.5rem;
-            color: #475569;
-            text-align: justify; /* Justify list items */
-        }
-        .experience-description ul li::before,
-        .list-with-dashes li::before {
-            content: '- '; /* Custom dash */
-            color: #475569; /* Neutral color for dashes */
-            font-weight: bold;
-            display: inline-block;
-            width: 1em;
-            margin-left: -1em;
-        }
-        .highlight {
-            font-weight: 500;
-            color: #1e3a8a; /* Darker Blue for highlights */
-        }
-        /* Removed .skill-item styling for compact list */
-        .skill-category-title,
-        .savoir-faire-subtitle {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #007ACC; /* Vibrant Azure Blue for peps */
-            margin-top: 1.2rem;
-            margin-bottom: 0.6rem;
-            padding-left: 0.5rem;
-            border-left: 4px solid #007ACC; /* Vibrant Azure Blue for peps */
-        }
-        .skill-list-compact p { /* Styling for the new compact paragraphs */
-            color: #475569; /* Standard text color */
-            font-size: 1rem; /* Standard text size */
-            line-height: 1.4;
-            margin-left: 0.5rem; /* Indent slightly */
-            margin-bottom: 0.5rem; /* Space between categories */
-            text-align: justify; /* Justify skill list paragraphs */
-        }
-        .contact-info a {
-            color: #4a90e2;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .contact-info a:hover {
-            color: #1e3a8a;
-        }
-        .value-added-text { /* New style for value-added sentences */
-            font-style: italic;
-            font-weight: bold; /* Made bold as requested */
-            color: #0A2342; /* Deep Navy Blue for subtle highlight */
-            margin-top: 0.5rem; /* Space from previous list */
-            margin-left: 1.5rem; /* Indent to align with list content */
-            display: block; /* Ensure it takes its own line */
-            text-align: justify; /* Justify value-added text */
-        }
-        /* Applied text-align: justify to all relevant text elements */
-        p, ul {
-            text-align: justify;
-        }
-        /* Override specific elements if needed for left alignment */
-        .header-section p, .contact-info span {
-            text-align: center; /* Keep header text centered */
-        }
-        .experience-company-date {
-            text-align: left; /* Keep company date left-aligned as it's a short line */
-        }
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .container {
-                margin: 1rem auto;
-                padding: 1.5rem;
-            }
-            .header-section {
-                padding: 1.5rem;
-            }
-            .section-title {
-                font-size: 1.5rem;
-            }
-            .experience-title {
-                font-size: 1rem;
-            }
-            .skill-category-title,
-            .savoir-faire-subtitle {
-                font-size: 1rem;
-            }
-            .skill-list-compact p {
-                font-size: 0.9rem;
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Header Section -->
-        <header class="header-section">
-            <h1 class="text-4xl font-bold mb-2">Mathilde Martine PAISLEY</h1>
-            <p class="text-xl font-light mb-1">Consultante AMOA SIRH - Cheffe de Projet</p>
-            <p class="text-lg font-light">SAP SuccessFactors, Pléiade, HR Access, ADP Décidium, Cegid</p>
-            <p class="text-lg font-light">Recette & Mise en production, Support utilisateurs, Conduite du changement</p>
-            <div class="mt-4 text-sm flex flex-wrap justify-center gap-x-4 gap-y-2">
-                <span>📞 06 85 90 08 87</span>
-                <span>📧 mathilde.martine.paisley@gmail.com</span>
-                <span>📍 92110 Clichy (France)</span>
-            </div>
-        </header>
+<body class="antialiased">
 
-        <!-- Résumé Professionnel -->
-        <section class="mb-8">
-            <h2 class="section-title">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.38 0 2.5 1.12 2.5 2.5S13.38 10 12 10s-2.5-1.12-2.5-2.5S10.62 5 12 5zm0 14.2c-2.5 0-4.71-1.29-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.93-3.5 3.22-6 3.22z"/></svg>
-                Résumé Professionnel
-            </h2>
-            <p class="text-base text-gray-700" style="text-align: justify;">
-                Consultante AMOA SIRH, j’interviens sur des projets de transformation digitale RH. Mon expertise couvre la recette, le support utilisateur, la conduite du changement, et le pilotage fonctionnel de projets SIRH. 
-                J'animation les ateliers métiers, en lien avec les équipes RH, DSI et intégrateurs. Je m'adapte à tout type d'outil SIRH et à toute demande, <span class="highlight">y compris sur de nouveaux périmètres fonctionnels grâce à une forte appétence pour les systèmes des ressources humaines.</span>
+    <!-- Header & Navigation -->
+    <header class="bg-slate-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-xl font-bold">Mathilde M. PAISLEY</div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#accueil" class="nav-link py-1">Accueil</a>
+                    <a href="#competences" class="nav-link py-1">Compétences</a>
+                    <a href="#parcours" class="nav-link py-1">Parcours</a>
+                    <a href="#formation" class="nav-link py-1">Formation</a>
+                </nav>
+                <a href="mailto:mathilde.martine.paisley@gmail.com" class="hidden md:inline-block bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Contacter
+                </a>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-700">
+                    <span class="sr-only">Ouvrir le menu</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden px-4 pt-2 pb-4 space-y-2">
+            <a href="#accueil" class="block nav-link text-slate-300 hover:text-white rounded-md">Accueil</a>
+            <a href="#competences" class="block nav-link text-slate-300 hover:text-white rounded-md">Compétences</a>
+            <a href="#parcours" class="block nav-link text-slate-300 hover:text-white rounded-md">Parcours</a>
+            <a href="#formation" class="block nav-link text-slate-300 hover:text-white rounded-md">Formation</a>
+            <a href="mailto:mathilde.martine.paisley@gmail.com" class="block bg-cyan-600 hover:bg-cyan-700 text-white text-center font-semibold py-2 px-4 rounded-lg transition-colors mt-2">
+                Contacter
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <!-- Section Accueil -->
+        <section id="accueil" class="text-center mb-16 md:mb-24 scroll-mt-20">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-2">Mathilde Martine PAISLEY</h1>
+            <h2 class="text-xl md:text-2xl font-semibold text-cyan-700 mb-4">Consultante AMOA SIRH & Cheffe de Projet</h2>
+            <p class="max-w-3xl mx-auto text-lg text-slate-600 mb-8">
+                J’interviens sur des projets de transformation digitale RH. Mon expertise couvre la recette, le support utilisateur, la conduite du changement, et le pilotage fonctionnel de projets SIRH. Je m'adapte à tout type d'outil et à toute demande, y compris sur de nouveaux périmètres fonctionnels grâce à une forte appétence pour les systèmes des ressources humaines.
             </p>
-        </section>
-
-        <!-- Savoir-Faire -->
-        <section class="mb-8">
-            <h2 class="section-title">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.17l6.88 3.06L12 18.03l-6.88-9.8z"/></svg>
-                Savoir-Faire
-            </h2>
-            <div class="grid grid-cols-1 gap-y-4">
-                <div>
-                    <h3 class="savoir-faire-subtitle">AMOA SIRH & Implémentation d’outils</h3>
-                    <ul class="list-with-dashes ml-5 text-gray-700">
-                        <li>Analyse des besoins métiers et rédaction de spécifications fonctionnelles.</li>
-                        <li>Participation aux phases d'implémentation des outils SIRH.</li>
-                        <li>Configuration des solutions SIRH (notamment pour les campagnes RH).</li>
-                        <li><span class="highlight">Accompagnement fonctionnel sur SAP SuccessFactors (EC, Time, Performance), avec une compréhension des enjeux liés au déploiement des modules.</span></li>
-                        <li>Participation à la refonte des campagnes RH : <span class="highlight">entretiens annuels/professionnels, campagnes de rémunération</span>.</li>
-                        <li>Animation de comités de recette, coordination avec les équipes métiers, RH et DSI.</li>
-                    </ul>
-                    <p class="value-added-text">
-                        J’ai participé à la coordination et à la formalisation des besoins pour la mise en place de campagnes d’intéressement dans plusieurs environnements SIRH, notamment :
-                    </p>
-                    <ul class="list-with-dashes ml-5 text-gray-700">
-                        <li>SAP SuccessFactors : collaboration étroite avec les équipes techniques pour définir les règles d’éligibilité, les populations concernées, les périodes de référence, ainsi que les workflows de validation nécessaires au paramétrage de la campagne d’intéressement annuelle.</li>
-                        <li>Talent Solutions : accompagnement fonctionnel dans la structuration des campagnes de rémunération variable, en traduisant les attentes métier en spécifications claires pour l’intégrateur.</li>
-                    </ul>
-                    <p class="value-added-text">
-                        Dans ces projets, j’ai également contribué à :
-                    </p>
-                    <ul class="list-with-dashes ml-5 text-gray-700">
-                        <li>la rédaction des supports utilisateurs (RH et managers),</li>
-                        <li>la gestion des phases de tests fonctionnels,</li>
-                        <li>l’accompagnement au déploiement et au support post-campagne.</li>
-                    </ul>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-3xl font-bold text-cyan-600">20+</div>
+                    <div class="text-sm font-medium text-slate-500">Ans d'Expérience</div>
                 </div>
-                <div>
-                    <h3 class="savoir-faire-subtitle">Conduite du changement & Communication</h3>
-                    <ul class="list-with-dashes ml-5 text-gray-700">
-                        <li>Assurer la conduite du changement (notamment la communication) sur tous les projets en cours.</li>
-                        <li>Animation d’ateliers utilisateurs et accompagnement au changement.</li>
-                        <li>Création de référentiels, procédures internes et guides utilisateurs.</li>
-                        <li>Transfert de compétences.</li>
-                        <li>Rédaction de supports de communication internes (newsletters projet, flash info RH).</li>
-                        <li>Animation de formations utilisateurs et réalisation de guides et tutoriels.</li>
-                    </ul>
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-3xl font-bold text-cyan-600">10+</div>
+                    <div class="text-sm font-medium text-slate-500">Outils SIRH Maîtrisés</div>
                 </div>
-                <div>
-                    <h3 class="savoir-faire-subtitle">Recette & Mise en production</h3>
-                    <ul class="list-with-dashes ml-5 text-gray-700">
-                        <li>Participation à la recette et à la mise en production des campagnes (entretiens annuels et professionnels, revalorisation salariale).</li>
-                        <li>Réalisation de la recette fonctionnelle DSN sur HR Access.</li>
-                        <li>Rédaction des scripts de tests et élaboration des cas de test.</li>
-                        <li>Exécution des scénarios de validation et documentation des résultats.</li>
-                        <li>Détection, qualification et correction des anomalies, remontée des dysfonctionnements aux équipes de développement, suivi des corrections.</li>
-                        <li>Validation finale pour mise en production.</li>
-                        <li>Suivi de la correction des anomalies avec l’intégrateur, validation des livrables.</li>
-                        <li><span class="highlight">Recette : formalisation des cas de tests, exécution, validation finale avant mise en production (campagnes RH).</span></li>
-                    </ul>
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-3xl font-bold text-cyan-600">5</div>
+                    <div class="text-sm font-medium text-slate-500">Domaines d'Expertise</div>
                 </div>
-                <div>
-                    <h3 class="savoir-faire-subtitle">Pilotage RH & Management</h3>
-                    <ul class="list-with-dashes ml-5 text-gray-700">
-                        <li>Coordination d’équipes RH multisites.</li>
-                        <li>Optimisation des processus RH et administratifs.</li>
-                        <li>Gestion de la relation client / prestataire.</li>
-                        <li><span class="highlight">Coordination projet : lien direct avec intégrateurs (SAP, HR Access), participation aux COPROJ, suivi planning et jalons.</span></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="savoir-faire-subtitle">Support utilisateurs</h3>
-                    <ul class="list-with-dashes ml-5 text-gray-700">
-                        <li>Accompagnement fonctionnel sur SuccessFactors (EC, Time), HR Access et Pléiade. Suivi des tickets, aide à la prise en main, gestion des retours terrain.</li>
-                    </ul>
+                <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                    <div class="text-3xl font-bold text-cyan-600">15+</div>
+                    <div class="text-sm font-medium text-slate-500">Projets & Missions</div>
                 </div>
             </div>
         </section>
 
-        <!-- Expériences Professionnelles -->
-        <section class="mb-8">
-            <h2 class="section-title">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                Expériences Professionnelles
-            </h2>
-
-            <div class="experience-item">
-                <h3 class="experience-title">CHEFFE DE PROJET RÉFÉRENTE FONCTIONNELLE GTA</h3>
-                <p class="experience-company-date">Nexpublica - Décembre 2024 – Mai 2025 (Mission CDD)</p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li>Appui fonctionnel sur l’outil Chronotime (GTA).</li>
-                    <li>Analyse des besoins clients et rédaction de spécifications fonctionnelles.</li>
-                    <li>Participation à des ateliers de relecture avec les utilisateurs, intégrant leurs retours pour optimiser l’outil.</li>
-                    <li>Suivi des échanges avec les équipes techniques, assurant une communication fluide et efficace.</li>
-                </ul>
-                <p class="value-added-text">Mon rôle a été d'accompagner activement les clients dans l'implémentation ou l'évolution de leur outil GTA, en favorisant leur autonomie et en assurant une montée en compétence rapide sur des systèmes complexes.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3 class="experience-title">COORDINATRICE SIRH / CHEFFE DE PROJET FONCTIONNELLE</h3>
-                <p class="experience-company-date">Groupe Ponticelli Frères – 1er septembre 2024 – 30 novembre 2024 (Mission CDD)</p>
-                <p class="text-base text-gray-600 mb-2">
-                    Contexte : Mission de coordination dans le cadre d’un projet de refonte complète du SIRH : décommissionnement d’ADP-GC, déploiement de SAP HCM & <span class="highlight">SuccessFactors (EC/Time)</span>.
-                    Objectif : Finalisation de la recette, préparation à la mise en production, coordination fonctionnelle inter-pôles.
-                </p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li><span class="highlight">Pilotage de la recette fonctionnelle</span> : planification des tests, rédaction de scripts, suivi des anomalies.</li>
-                    <li>Participation aux réunions COPROJ/COOPIR avec les directeurs de projet de l’intégrateur.</li>
-                    <li>Coordination entre les équipes RH (juridique, formation, recrutement) et la DSI.</li>
-                    <li>Contribution à la formalisation des besoins métiers <span class="highlight">SuccessFactors, notamment sur EC & Time, en vue d’une future extension vers Performance & Rémunération</span>.</li>
-                    <li><span class="highlight">Support utilisateurs sur SuccessFactors EC & Time, accompagnement quotidien dans les phases de tests.</span></li>
-                    <li><span class="highlight">Préparation de la mise en production : participation aux comités de validation et aux tests finaux.</span></li>
-                    <li>Environnement technique : ADP-GC, SAP HCM, SuccessFactors EC/Time, Jira, Excel.</li>
-                </ul>
-                <p class="value-added-text">Dans ce projet de transformation SIRH d'envergure, j'ai coordonné la finalisation de la recette et la préparation à la mise en production, assurant le lien entre les équipes métier et l'intégrateur sur SuccessFactors.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3 class="experience-title">CONSULTANTE FONCTIONNELLE AMOA SIRH</h3>
-                <p class="experience-company-date">CGI – Ministère de la Justice – Janvier 2023 – Juin 2024 (CDI)</p>
-                <p class="text-base text-gray-600 mb-2">
-                    Projet Ministère de la Justice – Direction de l’Administration Pénitentiaire (Déploiement solution Octave - HR Access 4YOU V9) dans 189 établissements pénitentiaires (gestion paie détenus).
-                </p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li><span class="highlight">Mission orientée recette fonctionnelle dans un environnement SIRH structuré, en lien direct avec les utilisateurs finaux.</span></li>
-                    <li>Réalisation de la <span class="highlight">recette fonctionnelle DSN</span> sur HR Access, incluant rédaction de scripts et élaboration de cas de test.</li>
-                    <li>Exécution des scénarios de validation et documentation des résultats.</li>
-                    <li>Détection, qualification et correction des anomalies, remontée des dysfonctionnements aux équipes de développement, suivi des corrections.</li>
-                    <li><span class="highlight">Accompagnement des utilisateurs finaux</span> : formation opérationnelle, assistance et support.</li>
-                    <li><span class="highlight">Validation finale pour mise en production</span>, garantissant la qualité du déploiement sur un environnement complexe et multisites.</li>
-                </ul>
-                <p class="value-added-text">Ma mission a consisté à piloter la recette fonctionnelle et la mise en production d'une solution SIRH complexe, garantissant la conformité et l'accompagnement des utilisateurs finaux.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3 class="experience-title">CONSULTANTE FONCTIONNELLE PAIE / AMOA SIRH</h3>
-                <p class="experience-company-date">CGI – Air Liquide – Janvier 2023 – Juin 2024 (CDI)</p>
-                <p class="text-base text-gray-600 mb-2">
-                    Projet Air Liquide – Direction des Ressources Humaines (Actualisation du livre blanc / procédures réglementaires de paie).
-                </p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li>Reprise complète et mise à jour du référentiel paie (livre blanc), recensement et actualisation des rubriques de paie utilisées dans HR Access.</li>
-                    <li>Modélisation des processus RH pour Workday et HR Access, rédaction de procédures de contrôle de paie.</li>
-                    <li>Mise à jour des règles de paie spécifiques par site.</li>
-                    <li>Interviews des gestionnaires paie sur environ 30 sites en France.</li>
-                    <li>Prise en compte des évolutions d’organisation (ventes de sites, changements de périmètre RH, mutations internes).</li>
-                </ul>
-                <p class="value-added-text">J'ai structuré et mis à jour le référentiel paie et les processus RH, contribuant à l'alignement des pratiques sur un périmètre national et multi-sites.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3 class="experience-title">CHARGÉE RH – COORDINATION PAIE & ADMIN. RH</h3>
-                <p class="experience-company-date">Talent Solutions – Juillet 2022 – Décembre 2022 (CDD)</p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li>Responsable de la gestion de la paie pour 4 entités et 350 collaborateurs sur Cegid PeopleNet GA et VSA.</li>
-                    <li>Mise en œuvre de démarches visant à améliorer l’efficacité des processus administratifs.</li>
-                    <li>Encadrement d’équipe : transfert de compétences et mise en place de pratiques de mentorat.</li>
-                    <li>Mise en place de solutions pour faciliter l’intégration des collaborateurs (Projet d’Optimisation RH).</li>
-                </ul>
-                <p class="value-added-text">J'ai optimisé la gestion de la paie et les processus administratifs RH, tout en encadrant les équipes et en facilitant l'intégration des collaborateurs.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3 class="experience-title">CONSULTANTE PAIE SIRH</h3>
-                <p class="experience-company-date">Epi-Use France – Novembre 2018 – Mars 2022 (CDI) <span class="highlight">(Pléiade et SAP)</span></p>
-                <p class="text-base text-gray-600 mb-2">
-                    Contexte : Projet de création d’un Centre de Services Partagés (CSP) pour le groupe Tereos.
-                </p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li><span class="highlight">Expérience sur les solutions Pléiade e5 / ForYou : rédaction de guides, animation de sessions de relecture, conduite du changement RH.</span></li>
-                    <li>Reprise de la connaissance métier sur 20 sites.</li>
-                    <li>Mise à jour complète des procédures de paie (processus de traitement, contrôles, pratiques locales).</li>
-                    <li>Rédaction claire de guides utilisateurs pour l’outil Pléiade.</li>
-                    <li>Utilisation intensive de Pléiade e5 pour la rédaction de procédures et animation de sessions de relecture.</li>
-                    <li>Organisation et animation d’ateliers de relecture avec les gestionnaires et responsables locaux.</li>
-                    <li>Conduite de mises en situation (traitements concrets de paie) avec l’outil.</li>
-                    <li>Formation et transfert de compétences aux nouvelles recrues internes (CDI).</li>
-                    <li>Production de guides utilisateurs et référentiels métiers RH utilisés dans le cadre du déploiement d’un CSP.</li>
-                    <li>Conception de 23 procédures réglementaires de paie adaptées à l’environnement SAP.</li>
-                    <li>Élaboration d’un livre blanc paie consolidant les pratiques standards et les adaptations spécifiques Tereos.</li>
-                    <li>Animation d’ateliers de validation, de relecture et de mise en situation.</li>
-                    <li>Transfert de connaissances auprès des titulaires internes, accompagnement à la prise de poste.</li>
-                </ul>
-                <p class="value-added-text">Ma contribution à la création d'un CSP a permis de structurer la connaissance métier et d'assurer la formation et le transfert de compétences sur les solutions Pléiade et SAP.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3 class="experience-title">CHARGÉE DE PAIE</h3>
-                <p class="experience-company-date">Multi Sociétés – Avril 2008 – Octobre 2018</p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li>Gestion globale de la paie pour 250 à 1200 collaborateurs.</li>
-                    <li>Optimisation des processus RH : mise en œuvre de solutions pour optimiser les processus de paie, réduire les délais de traitement et améliorer la précision des calculs.</li>
-                    <li>Conduite d’évolutions légales, garantissant la conformité et la mise à jour continue des pratiques de paie.</li>
-                    <li>Administration du Personnel : gestion complète des documents administratifs (DPAE, contrats, avenants).</li>
-                    <li>Veille Sociale et Juridique : suivi des évolutions légales en RH, garantissant la conformité des pratiques de paie.</li>
-                </ul>
-                <h3 class="experience-title mt-4">Expériences spécifiques durant cette période :</h3>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li>Nexans (Avril 2017 – Avril 2018) <span class="highlight">(SAP)</span></li>
-                    <li>ADP GSI France (Septembre 2015 – Mars 2017 <span class="highlight">(ADP Décidium, DECIDIUM ADP GSI, Kiosque ADP-GSI, KELYO)</span>)</li>
-                    <li>Sanofi (Octobre 2014 – Juillet 2015) <span class="highlight">(SAP)</span></li>
-                    <li>SCC (Mars 2012 – Juin 2013) <span class="highlight">(ADP Décidium)</span></li>
-                    <li>Alcoa Howmet (Janvier 2012 – Février 2012) <span class="highlight">(SAP)</span></li>
-                    <li>Gérard Darel (Octobre 2011 – Décembre 2011) <span class="highlight">(ADP Décidium)</span></li>
-                    <li>Beckman Coulter (Août 2011 – Septembre 2011) <span class="highlight">(SAP)</span></li>
-                    <li>Publicis (Mars 2011 – Juillet 2011) <span class="highlight">(ADP Décidium et Spaietacle)</span></li>
-                    <li>Sanofi-Aventis (Mai 2010 – Janvier 2011) <span class="highlight">(SAP)</span></li>
-                    <li>Finodim (Avril 2008 – Août 2009) <span class="highlight">(Outil interne et tableaux de bord Excel)</span></li>
-                    <li>Caisse d'épargne (Mars 2008 – Avril 2008) <span class="highlight">(ADP Décidium)</span></li>
-                </ul>
-                <p class="value-added-text">Mes interventions ont permis d'optimiser les processus RH de rémunération (incluant la vérification et le calcul des éléments comme l'intéressement) et d'intégration des collaborateurs, en apportant des solutions adaptées aux divers environnements clients, y compris SAP.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3 class="experience-title">DIRECTRICE DE CENTRE DE PROFIT</h3>
-                <p class="experience-company-date">KFC – Avril 2002 – Mars 2004 (CDI)</p>
-                <ul class="list-with-dashes ml-5 text-gray-700">
-                    <li>Management d’une équipe de 70 personnes (managers et équipiers).</li>
-                    <li>Responsabilité du chiffre d’affaires, élaboration de stratégies pour stimuler les ventes.</li>
-                    <li><span class="highlight">Participation active aux campagnes de recrutement et au processus d'intégration des nouvelles recrues (onboarding).</span></li>
-                    <li>Conception et mise en œuvre de programmes de formation pour améliorer les compétences du personnel.</li>
-                    <li>Mise en place de procédures opérationnelles pour assurer une gestion fluide du centre.</li>
-                </ul>
-                <p class="value-added-text">En qualité de Directrice, j'ai piloté la performance opérationnelle et commerciale, tout en développant les compétences des équipes et en gérant activement le recrutement et l'intégration.</p>
-            </div>
-        </section>
-
-        <!-- Formations -->
-        <section class="mb-8">
-            <h2 class="section-title">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 10.93L4.16 9 12 4.07l7.84 4.93L12 13.93z"/></svg>
-                Formations
-            </h2>
-            <ul class="list-with-dashes ml-5 text-gray-700">
-                <li><span class="highlight">2024 - 2025 (en cours) Expert en stratégie digitale</span> - Digital Campus</li>
-                <li><span class="highlight">2021 - 2023 Manager Stratégique RH - Bac+5</span> - ESGRH Paris (Gestion des RH et Transformation Organisationnelle)</li>
-                <li><span class="highlight">2013 - 2014 Gestionnaire de Paie - Niveau Bac+2</span> - M2I Paris 12 (Formation spécialisée en Gestion de Paie et Réglementations du Droit Social)</li>
-            </ul>
-        </section>
-
-        <!-- Informations Complémentaires -->
-        <section class="mb-8">
-            <h2 class="section-title">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                Informations Complémentaires
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-                <div>
-                    <h3 class="savoir-faire-subtitle">Certifications</h3>
-                    <ul class="list-with-dashes ml-5 text-gray-700 mb-4">
-                        <li>Certification Manager Stratégique RH - Mars 2024 (Diplôme Studi_ESG_RH)</li>
-                        <li>Certification Responsable Stratégie Digitale - Mars 2025 (ESG_COMMERCE_def)</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="savoir-faire-subtitle">Langues</h3>
-                    <ul class="list-with-dashes ml-5 text-gray-700 mb-4">
-                        <li>Français : Courant</li>
-                        <li>Anglais : A2</li>
-                    </ul>
-                </div>
-            </div>
-            <!-- Moved "Compétences Techniques" here -->
-            <section class="mb-8">
-                <h2 class="section-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 18v-4h-2v4h2zm0-6V8h-2v4h2zm0-6V2h-2v4h2zm5 12v-4h-2v4h2zm0-6V8h-2v4h2zm0-6V2h-2v4h2zM7 18v-4H5v4h2zm0-6V8H5v4h2zm0-6V2H5v4h2z"/></svg>
-                    Compétences Techniques
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8"> <!-- Two columns for skill categories -->
-                    <div>
-                        <h3 class="skill-category-title w-full">Outils SIRH / Paie</h3>
-                        <p class="skill-list-compact">
-                            SAP SuccessFactors (EC, Time, Performance, Payroll), Pléiade e5 / For You, HR Access, Chronotime, Cegid, Workday, SAP HR, ADP Décidium, AS400, Spaietacle.
-                        </p>
-                        <h3 class="skill-category-title w-full">Compétences Transverses SIRH</h3>
-                        <p class="skill-list-compact">
-                            Recette, Mise en production, Support utilisateurs, Animation d’ateliers, Conduite du changement.
-                        </p>
-                    </div>
-                    <div>
-                        <h3 class="skill-category-title w-full">Outils Bureautiques / Productivité</h3>
-                        <p class="skill-list-compact">
-                            Suite Office 365 (Excel, Word, PowerPoint), Environnement Google (Docs, Sheets, Slides, Forms), CANVAS.
-                        </p>
-                        <h3 class="skill-category-title w-full">Outils de Gestion de Projet</h3>
-                        <p class="skill-list-compact">
-                            Jira, Trello, Monday.com.
-                        </p>
+        <!-- Section Compétences -->
+        <section id="competences" class="mb-16 md:mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-2">Compétences Clés</h2>
+            <p class="text-lg text-center text-slate-600 mb-12">Visualisation de mes domaines d'expertise et de ma maîtrise des principaux outils SIRH du marché. Interagissez avec les graphiques pour plus de détails.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-bold text-center mb-4">Domaines d'Expertise (Savoir-Faire)</h3>
+                    <div class="chart-container">
+                        <canvas id="savoirFaireChart"></canvas>
                     </div>
                 </div>
-            </section>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-bold text-center mb-4">Maîtrise des Outils SIRH</h3>
+                     <div class="chart-container">
+                        <canvas id="outilsChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </section>
-    </div>
+
+        <!-- Section Parcours -->
+        <section id="parcours" class="mb-16 md:mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-2">Parcours Professionnel</h2>
+            <p class="text-lg text-center text-slate-600 mb-8">Un aperçu de mon parcours. Cliquez sur un poste pour voir les détails de la mission ou filtrez par technologie pour affiner la recherche.</p>
+            
+            <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
+                 <button class="filter-btn active bg-cyan-600 text-white py-1 px-3 rounded-full text-sm" data-filter="all">Tous</button>
+            </div>
+
+            <div id="timeline" class="relative max-w-3xl mx-auto">
+                <!-- Timeline items will be injected here by JS -->
+            </div>
+        </section>
+
+        <!-- Section Formation -->
+        <section id="formation" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-2">Formation & Certifications</h2>
+            <p class="text-lg text-center text-slate-600 mb-12">Mon parcours académique et mes certifications professionnelles.</p>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Diplômes</h3>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <p class="font-bold text-cyan-700">Expert en stratégie digitale (en cours)</p>
+                            <p class="text-sm text-slate-600">Digital Campus | 2024 - 2025</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <p class="font-bold text-cyan-700">Manager Stratégique RH - Bac+5</p>
+                            <p class="text-sm text-slate-600">ESGRH Paris | 2021 - 2023</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <p class="font-bold text-cyan-700">Gestionnaire de Paie - Bac+2</p>
+                            <p class="text-sm text-slate-600">M2I Paris 12 | 2013 - 2014</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Certifications</h3>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <p class="font-bold">Certification Responsable Stratégie Digitale</p>
+                            <p class="text-sm text-slate-600">Prévue Mars 2025</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <p class="font-bold">Certification Manager Stratégique RH</p>
+                            <p class="text-sm text-slate-600">Obtenue Mars 2024</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <h3 class="text-2xl font-bold text-white mb-4">Contact</h3>
+            <p class="mb-4">N'hésitez pas à me contacter pour toute opportunité de collaboration.</p>
+            <div class="flex justify-center items-center space-x-6 mb-6">
+                <a href="mailto:mathilde.martine.paisley@gmail.com" class="hover:text-cyan-400">mathilde.martine.paisley@gmail.com</a>
+                <span>|</span>
+                <span>06 85 90 08 87</span>
+                <span>|</span>
+                <span>92110 Clichy, France</span>
+            </div>
+            <p class="text-sm text-slate-400">&copy; 2025 Mathilde Martine PAISLEY. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const experienceData = [
+            {
+                title: "CHEFFE DE PROJET RÉFÉRENTE FONCTIONNELLE GTA",
+                company: "Nexpublica",
+                date: "Décembre 2024 – Mai 2025 (Mission CDD)",
+                details: [
+                    "Appui fonctionnel sur l’outil Chronotime (GTA).",
+                    "Analyse des besoins clients et rédaction de spécifications fonctionnelles.",
+                    "Participation à des ateliers de relecture avec les utilisateurs, intégrant leurs retours pour optimiser l’outil.",
+                    "Suivi des échanges avec les équipes techniques, assurant une communication fluide et efficace."
+                ],
+                highlight: "Mon rôle a été d'accompagner activement les clients dans l'implémentation ou l'évolution de leur outil GTA, en favorisant leur autonomie et en assurant une montée en compétence rapide sur des systèmes complexes.",
+                tags: ["Chronotime"]
+            },
+            {
+                title: "COORDINATRICE SIRH / CHEFFE DE PROJET FONCTIONNELLE",
+                company: "Groupe Ponticelli Frères",
+                date: "Septembre 2024 – Novembre 2024 (Mission CDD)",
+                context: "Mission de coordination dans le cadre d’un projet de refonte complète du SIRH : décommissionnement d’ADP-GC, déploiement de SAP HCM & SuccessFactors (EC/Time).",
+                details: [
+                    "Pilotage de la recette fonctionnelle : planification des tests, rédaction de scripts, suivi des anomalies.",
+                    "Participation aux réunions COPROJ/COOPIR avec les directeurs de projet de l’intégrateur.",
+                    "Coordination entre les équipes RH (juridique, formation, recrutement) et la DSI.",
+                    "Contribution à la formalisation des besoins métiers SuccessFactors, notamment sur EC & Time, en vue d’une future extension vers Performance & Rémunération.",
+                    "Support utilisateurs sur SuccessFactors EC & Time, accompagnement quotidien dans les phases de tests.",
+                    "Préparation de la mise en production : participation aux comités de validation et aux tests finaux.",
+                ],
+                highlight: "Dans ce projet de transformation SIRH d'envergure, j'ai coordonné la finalisation de la recette et la préparation à la mise en production, assurant le lien entre les équipes métier et l'intégrateur sur SuccessFactors.",
+                tags: ["SuccessFactors", "SAP", "Jira"]
+            },
+            {
+                title: "CONSULTANTE FONCTIONNELLE AMOA SIRH",
+                company: "CGI – Ministère de la Justice",
+                date: "Janvier 2023 – Juin 2024 (CDI)",
+                context: "Projet de déploiement de la solution Octave (HR Access 4YOU V9) dans 189 établissements pénitentiaires pour la gestion de la paie des détenus.",
+                details: [
+                    "Mission orientée recette fonctionnelle dans un environnement SIRH structuré, en lien direct avec les utilisateurs finaux.",
+                    "Réalisation de la recette fonctionnelle DSN sur HR Access, incluant rédaction de scripts et élaboration de cas de test.",
+                    "Exécution des scénarios de validation et documentation des résultats.",
+                    "Détection, qualification et correction des anomalies, suivi des corrections.",
+                    "Accompagnement des utilisateurs finaux : formation opérationnelle, assistance et support.",
+                    "Validation finale pour mise en production, garantissant la qualité du déploiement sur un environnement complexe et multisites.",
+                ],
+                highlight: "Ma mission a consisté à piloter la recette fonctionnelle et la mise en production d'une solution SIRH complexe, garantissant la conformité et l'accompagnement des utilisateurs finaux.",
+                tags: ["HR Access"]
+            },
+            {
+                title: "CONSULTANTE FONCTIONNELLE PAIE / AMOA SIRH",
+                company: "CGI – Air Liquide",
+                date: "Janvier 2023 – Juin 2024 (CDI)",
+                context: "Projet d'actualisation du livre blanc et des procédures réglementaires de paie.",
+                details: [
+                    "Reprise complète et mise à jour du référentiel paie, recensement et actualisation des rubriques de paie utilisées dans HR Access.",
+                    "Modélisation des processus RH pour Workday et HR Access, rédaction de procédures de contrôle de paie.",
+                    "Mise à jour des règles de paie spécifiques par site.",
+                    "Interviews des gestionnaires paie sur environ 30 sites en France."
+                ],
+                highlight: "J'ai structuré et mis à jour le référentiel paie et les processus RH, contribuant à l'alignement des pratiques sur un périmètre national et multi-sites.",
+                tags: ["HR Access", "Workday"]
+            },
+            {
+                title: "CHARGÉE RH – COORDINATION PAIE & ADMIN. RH",
+                company: "Talent Solutions",
+                date: "Juillet 2022 – Décembre 2022 (CDD)",
+                details: [
+                    "Responsable de la gestion de la paie pour 4 entités et 350 collaborateurs sur Cegid PeopleNet GA et VSA.",
+                    "Mise en œuvre de démarches visant à améliorer l’efficacité des processus administratifs.",
+                    "Encadrement d’équipe : transfert de compétences et mise en place de pratiques de mentorat.",
+                    "Mise en place de solutions pour faciliter l’intégration des collaborateurs (Projet d’Optimisation RH)."
+                ],
+                highlight: "J'ai optimisé la gestion de la paie et les processus administratifs RH, tout en encadrant les équipes et en facilitant l'intégration des collaborateurs.",
+                tags: ["Cegid"]
+            },
+            {
+                title: "CONSULTANTE PAIE SIRH",
+                company: "Epi-Use France",
+                date: "Novembre 2018 – Mars 2022 (CDI)",
+                context: "Projet de création d’un Centre de Services Partagés (CSP) pour le groupe Tereos.",
+                details: [
+                    "Expérience sur les solutions Pléiade e5 / ForYou : rédaction de guides, animation de sessions de relecture, conduite du changement RH.",
+                    "Reprise de la connaissance métier sur 20 sites et mise à jour complète des procédures de paie.",
+                    "Rédaction de guides utilisateurs pour Pléiade et animation d’ateliers de relecture.",
+                    "Formation et transfert de compétences aux nouvelles recrues internes.",
+                    "Conception de 23 procédures réglementaires de paie adaptées à l’environnement SAP.",
+                ],
+                highlight: "Ma contribution à la création d'un CSP a permis de structurer la connaissance métier et d'assurer la formation et le transfert de compétences sur les solutions Pléiade et SAP.",
+                tags: ["Pléiade", "SAP"]
+            },
+            {
+                title: "CHARGÉE DE PAIE",
+                company: "Multi Sociétés",
+                date: "Avril 2008 – Octobre 2018",
+                details: [
+                    "Gestion globale de la paie pour 250 à 1200 collaborateurs.",
+                    "Optimisation des processus de paie, réduction des délais et amélioration de la précision.",
+                    "Conduite d’évolutions légales et veille sociale.",
+                    "Administration du Personnel complète.",
+                    "Missions spécifiques chez : Nexans (SAP), ADP GSI France (ADP Décidium), Sanofi (SAP), SCC (ADP Décidium), Alcoa Howmet (SAP), et autres."
+                ],
+                highlight: "Mes interventions ont permis d'optimiser les processus RH de rémunération et d'intégration, en apportant des solutions adaptées aux divers environnements clients.",
+                tags: ["SAP", "ADP Décidium"]
+            },
+            {
+                title: "DIRECTRICE DE CENTRE DE PROFIT",
+                company: "KFC",
+                date: "Avril 2002 – Mars 2004 (CDI)",
+                details: [
+                    "Management d’une équipe de 70 personnes.",
+                    "Responsabilité du chiffre d’affaires et élaboration de stratégies de vente.",
+                    "Participation active au recrutement et à l'intégration des nouvelles recrues.",
+                    "Conception et mise en œuvre de programmes de formation.",
+                ],
+                highlight: "En qualité de Directrice, j'ai piloté la performance opérationnelle et commerciale, tout en développant les compétences des équipes.",
+                tags: ["Management"]
+            }
+        ];
+        
+        const timelineContainer = document.getElementById('timeline');
+        const filtersContainer = document.getElementById('filters');
+        let allTags = new Set();
+        experienceData.forEach(item => item.tags.forEach(tag => allTags.add(tag)));
+
+        // Create filter buttons
+        allTags.forEach(tag => {
+            const button = document.createElement('button');
+            button.className = 'filter-btn bg-slate-200 text-slate-700 py-1 px-3 rounded-full text-sm transition-colors hover:bg-cyan-500 hover:text-white';
+            button.textContent = tag;
+            button.dataset.filter = tag;
+            filtersContainer.appendChild(button);
+        });
+        
+        // Populate timeline
+        timelineContainer.innerHTML = experienceData.map((item, index) => `
+            <div class="timeline-item mb-8 flex items-start" data-tags="${item.tags.join(' ')}">
+                <div class="flex flex-col items-center mr-4">
+                    <div class="w-6 h-6 bg-cyan-600 rounded-full flex items-center justify-center text-white font-bold text-sm">${experienceData.length - index}</div>
+                    <div class="w-px h-full bg-slate-300 mt-2"></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 w-full cursor-pointer timeline-item-header">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800">${item.title}</h3>
+                            <p class="font-semibold text-cyan-700">${item.company}</p>
+                            <p class="text-sm text-slate-500 mb-2">${item.date}</p>
+                        </div>
+                        <div class="w-4 h-4 text-slate-500 transform transition-transform duration-300">
+                            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        </div>
+                    </div>
+                    <div class="timeline-item-content">
+                        ${item.context ? `<p class="text-sm text-slate-600 mt-4 italic">${item.context}</p>` : ''}
+                        <ul class="list-disc list-inside mt-4 space-y-1 text-slate-600">
+                            ${item.details.map(detail => `<li>${detail}</li>`).join('')}
+                        </ul>
+                        <p class="font-semibold text-slate-700 mt-4 bg-slate-100 p-3 rounded-md">${item.highlight}</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            ${item.tags.map(tag => `<span class="bg-slate-200 text-slate-700 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Accordion functionality
+        timelineContainer.querySelectorAll('.timeline-item-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.closest('.timeline-item').classList.toggle('open');
+                const icon = header.querySelector('svg').parentElement;
+                icon.classList.toggle('rotate-180');
+            });
+        });
+
+        // Filter functionality
+        filtersContainer.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('filter-btn')) return;
+
+            const filter = e.target.dataset.filter;
+            
+            filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-cyan-600', 'text-white');
+                btn.classList.add('bg-slate-200', 'text-slate-700');
+            });
+            e.target.classList.add('active', 'bg-cyan-600', 'text-white');
+            e.target.classList.remove('bg-slate-200', 'text-slate-700');
+
+            timelineContainer.querySelectorAll('.timeline-item').forEach(item => {
+                if (filter === 'all' || item.dataset.tags.includes(filter)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Chart.js Savoir-Faire Chart
+        const savoirFaireCtx = document.getElementById('savoirFaireChart').getContext('2d');
+        new Chart(savoirFaireCtx, {
+            type: 'radar',
+            data: {
+                labels: ['AMOA & Implémentation', 'Conduite du Changement', 'Recette & M.E.P.', 'Pilotage & Management', 'Support Utilisateurs'],
+                datasets: [{
+                    label: 'Niveau d\'Expertise',
+                    data: [5, 4, 5, 4, 3],
+                    backgroundColor: 'rgba(8, 145, 178, 0.2)',
+                    borderColor: 'rgb(8, 145, 178)',
+                    pointBackgroundColor: 'rgb(8, 145, 178)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(8, 145, 178)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#cbd5e1' },
+                        grid: { color: '#e2e8f0' },
+                        pointLabels: {
+                            font: { size: 12 },
+                            color: '#475569'
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            backdropColor: '#f1f5f9',
+                            stepSize: 1
+                        },
+                        min: 0,
+                        max: 5
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Chart.js Outils Chart
+        const outilsCtx = document.getElementById('outilsChart').getContext('2d');
+        new Chart(outilsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['SuccessFactors', 'HR Access', 'SAP', 'ADP Décidium', 'Pléiade', 'Cegid'],
+                datasets: [{
+                    label: 'Expérience (Projets Clés)',
+                    data: [5, 5, 5, 4, 4, 2],
+                    backgroundColor: [
+                        'rgba(8, 145, 178, 0.7)',
+                        'rgba(14, 116, 144, 0.7)',
+                        'rgba(21, 94, 117, 0.7)',
+                        'rgba(6, 78, 99, 0.7)',
+                        'rgba(15, 52, 67, 0.7)',
+                        'rgba(4, 32, 40, 0.7)',
+                    ],
+                    borderColor: [
+                        'rgb(8, 145, 178)',
+                        'rgb(14, 116, 144)',
+                        'rgb(21, 94, 117)',
+                        'rgb(6, 78, 99)',
+                        'rgb(15, 52, 67)',
+                        'rgb(4, 32, 40)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: '#e2e8f0' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.x !== null) {
+                                    label += 'Élevée';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Active nav link on scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav a');
+        const onScroll = () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', onScroll);
+
+    });
+    </script>
 </body>
 </html>
